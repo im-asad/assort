@@ -9,7 +9,7 @@ class Welcome extends React.Component {
     const token = await _retrieveData('token');
     const response = await verifyToken(token);
     if (response.status === 200) {
-      this.props.navigation.navigate('dashboard');
+      this.props.navigation.navigate('Dashboard');
     } else {
       alert('you are not logged in');
     }
@@ -21,7 +21,7 @@ class Welcome extends React.Component {
         <Image style={styles.logo} source={require('../assets/logo.png')} />
         <TouchableOpacity
           style={styles.loginButton}
-          onPress={() => this.props.navigation.navigate('login')}>
+          onPress={() => this.props.navigation.navigate('Login')}>
           <Text style={styles.textStyles}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.registerButton}>

@@ -37,12 +37,12 @@ class Navigator extends React.Component {
               headerTintColor: '#fff',
               headerTitleStyle: {
                 fontWeight: 'bold',
-                  textAlign: 'center'
+                textAlign: 'center',
               },
             }}
           />
           <Stack.Screen
-            name="Home"
+            name="Welcome"
             options={{header: () => null}}
             component={Welcome}
           />
