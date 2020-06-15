@@ -1,17 +1,20 @@
-import getAxiosInstance from '../singletons/axios';
+import axiosAuth from 'axios';
+import {_retrieveData} from '../utils/asyncStorage';
 
-const base_url = 'http://localhost:8080';
-export const verifyToken = async token => {
-  const axios = getAxiosInstance(token);
+const base_url = 'https://instaconnect.ngrok.io';
+export const verifyToken = async () => {
+  const token = await _retrieveData('token');
   const url = base_url + '/api/verify-token';
-  const response = await axios.post(url);
+  const response = await axiosAuth.post(url, null, {
+    headers: {Authorization: `Bearer ${token}`},
+  });
   return response.data;
 };
 
 export const login = async credentials => {
-  const axios = getAxiosInstance(null);
   const url = base_url + '/api/login';
-  const response = await axios.post(url, credentials);
+  console.log('ASD');
+  const response = await axiosAuth.post(url, credentials);
   console.log(response);
   return response.data;
 };

@@ -19,7 +19,7 @@ class Navigator extends React.Component {
   render() {
     return (
       <NavigationContainer theme={MyTheme}>
-        <Stack.Navigator initialRouteName="Dashboard">
+        <Stack.Navigator initialRouteName="Welcome">
           <Stack.Screen
             name="Dashboard"
             component={Dashboard}

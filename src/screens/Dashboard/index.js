@@ -4,8 +4,63 @@ import {Container, Tab, Tabs} from 'native-base';
 import Settings from './Settings';
 import Routes from './Routes';
 import Bins from './Bins';
+import {fetchAreas, fetchBins} from '../../actions/bins';
+import {_retrieveData, _storeData} from '../../utils/asyncStorage';
 export default class Dashboard extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      areas: null,
+      bins: null,
+      fillPercentage: 0.0,
+      areaSelected: '',
+    };
+  }
+
+  async componentDidMount() {
+    const resAreas = await fetchAreas();
+    const resBins = await fetchBins();
+    console.log('res bins', resBins.bins);
+    let settings = await _retrieveData('bins_settings');
+    if (settings) {
+      settings = JSON.parse(settings);
+      this.setState({
+        fillPercentage: parseFloat(settings.fillPercentage),
+        areaSelected: settings.areaSelected,
+      });
+    }
+    this.setState({
+      areas: resAreas.areas,
+      bins: resBins.bins,
+    });
+  }
+  handleAreaChange = areaSelected => {
+    this.setState({areaSelected});
+  };
+  handlePercentageChange = fillPercentage => {
+    this.setState({fillPercentage: parseFloat(fillPercentage.toFixed(1))});
+  };
+  handleSaveClick = async () => {
+    const {fillPercentage, areaSelected} = this.state;
+    const res = await _storeData(
+      'bins_settings',
+      JSON.stringify({
+        fillPercentage,
+        areaSelected,
+      }),
+    );
+    if (res) {
+      const resBins = await fetchBins();
+      this.setState({bins: resBins.bins});
+      // eslint-disable-next-line no-alert
+      alert('Settings saved!');
+    } else {
+      alert('Some error occurred saving settings, please try again later.');
+    }
+  };
   render() {
+    const {areas, bins, fillPercentage, areaSelected} = this.state;
+    console.log('dashb', bins);
     return (
       <Container>
         <Tabs
@@ -18,7 +73,7 @@ export default class Dashboard extends Component {
             activeTabStyle={styles.activeTabStyle}
             textStyle={styles.textStyle}
             activeTextStyle={styles.activeTextStyle}>
-            <Bins />
+            <Bins bins={bins} areas={areas} />
           </Tab>
           <Tab
             heading={'Settings'}
@@ -26,7 +81,14 @@ export default class Dashboard extends Component {
             activeTabStyle={styles.activeTabStyle}
             textStyle={styles.textStyle}
             activeTextStyle={styles.activeTextStyle}>
-            <Settings />
+            <Settings
+              fillPercentage={fillPercentage}
+              areaSelected={areaSelected}
+              areas={areas}
+              onAreaChange={this.handleAreaChange}
+              onSaveClick={this.handleSaveClick}
+              onPercentageChange={this.handlePercentageChange}
+            />
           </Tab>
           <Tab
             heading={'Routes'}
@@ -34,7 +96,7 @@ export default class Dashboard extends Component {
             activeTabStyle={styles.activeTabStyle}
             textStyle={styles.textStyle}
             activeTextStyle={styles.activeTextStyle}>
-            <Routes />
+            <Routes bins={bins} />
           </Tab>
         </Tabs>
       </Container>

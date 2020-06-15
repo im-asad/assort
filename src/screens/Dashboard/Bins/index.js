@@ -15,27 +15,20 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import {fetchAreas, fetchBins} from '../../../actions/bins';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const Bins = () => {
+const Bins = ({bins, areas}) => {
   const [areaSelected, setAreaSelected] = useState('');
-  const [areas, setAreas] = useState(null);
-  const [bins, setBins] = useState(null);
   React.useEffect(() => {
-    handleAsyncApis();
-  }, []);
+    if (areas) {
+      setAreaSelected(areas[0].areaId);
+    }
+  }, [areas]);
 
-  const handleAsyncApis = async () => {
-    const resBins = await fetchBins();
-    const resAreas = await fetchAreas();
-    setBins(resBins.bins);
-    setAreas(resAreas.areas);
-    setAreaSelected(resAreas.areas[0].areaId);
-  };
   const onAreaChange = area => {
     setAreaSelected(area);
   };
+  console.log(bins)
   return (
     <View style={styles.container}>
       {bins ? (
@@ -84,7 +77,7 @@ const Bins = () => {
         ) : (
           <View style={styles.noBinsWrapper}>
             <Text style={styles.noBinsText}>
-              No bins found for selected fill area
+              No bins found for selected fill level
             </Text>
           </View>
         )

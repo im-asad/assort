@@ -1,44 +1,17 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View, Text, Form, Picker, Item, Icon, Button} from 'native-base';
 import Slider from '@react-native-community/slider';
 import {ActivityIndicator, StyleSheet} from 'react-native';
-import {_retrieveData, _storeData} from '../../../utils/asyncStorage';
-import {fetchAreas} from '../../../actions/bins';
 
-const Settings = () => {
-  const [percentage, setPercentage] = useState(0.0);
-  const [areaSelected, setAreaSelected] = useState('');
-  const [areas, setAreas] = useState(null);
-  React.useEffect(() => {
-    handleAsyncApis();
-  }, []);
-
-  const handleAsyncApis = async () => {
-    const resAreas = await fetchAreas();
-    let settings = await _retrieveData('bins_settings');
-    setAreas(resAreas.areas);
-    settings = JSON.parse(settings);
-    setPercentage(parseFloat(settings.percentage));
-    setAreaSelected(settings.areaSelected);
-  };
-
-  const onAreaChange = area => {
-    setAreaSelected(area);
-  };
-  const handleClickSave = async () => {
-    const data = {
-      percentage,
-      areaSelected,
-    };
-    console.log('Amir', areaSelected);
-    const res = await _storeData('bins_settings', JSON.stringify(data));
-    if (res) {
-      // eslint-disable-next-line no-alert
-      alert('Settings saved!');
-    } else {
-      alert('Some error occurred saving settings, please try again later.');
-    }
-  };
+const Settings = props => {
+  const {
+    areas,
+    fillPercentage,
+    areaSelected,
+    onAreaChange,
+    onSaveClick,
+    onPercentageChange,
+  } = props;
   return (
     <View style={styles.container}>
       <Text>Desired fill level</Text>
@@ -51,13 +24,10 @@ const Settings = () => {
               maximumValue={100}
               minimumTrackTintColor="#85C872"
               maximumTrackTintColor="#000000"
-              value={percentage}
-              onValueChange={value => {
-                console.log(value);
-                setPercentage(parseFloat(value.toFixed(1)));
-              }}
+              value={fillPercentage}
+              onValueChange={value => onPercentageChange(value)}
             />
-            <Text>{percentage}%</Text>
+            <Text>{fillPercentage}%</Text>
           </View>
           <Text style={styles.areaLabel}>Area</Text>
           <Item picker>
@@ -69,14 +39,14 @@ const Settings = () => {
               placeholderStyle={{color: '#bfc6ea'}}
               placeholderIconColor="#007aff"
               selectedValue={areaSelected}
-              onValueChange={onAreaChange}>
+              onValueChange={area => onAreaChange(area)}>
               {areas &&
                 areas.map(areaObj => (
                   <Picker.Item label={areaObj.area} value={areaObj.areaId} />
                 ))}
             </Picker>
           </Item>
-          <Button style={styles.saveBtn} onPress={handleClickSave}>
+          <Button style={styles.saveBtn} onPress={() => onSaveClick()}>
             <Text style={styles.btnText}>Save</Text>
           </Button>
         </Form>

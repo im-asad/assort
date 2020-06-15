@@ -1,13 +1,11 @@
 import React from 'react';
 import {StyleSheet, TouchableOpacity, Image} from 'react-native';
 import {View, Text} from 'native-base';
-import {_retrieveData, _storeData} from '../utils/asyncStorage';
 import {verifyToken} from '../actions/auth';
 
 class Welcome extends React.Component {
   async componentDidMount() {
-    const token = await _retrieveData('token');
-    const response = await verifyToken(token);
+    const response = await verifyToken();
     if (response.status === 200) {
       this.props.navigation.navigate('Dashboard');
     } else {
